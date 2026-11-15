@@ -1,0 +1,169 @@
+{
+  "info": {
+    "_postman_id": "c1f82b7d-419b-4f9e-a0e2-63b1ef8a11bc",
+    "name": "Tasks API - NestJS",
+    "description": "Colección de endpoints para probar el CRUD de Tasks API (NestJS + Prisma + PostgreSQL).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Crear Tarea",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "if (pm.response.code === 201 || pm.response.code === 200) {",
+              "    var jsonData = pm.response.json();",
+              "    if (jsonData.id) {",
+              "        pm.collectionVariables.set('taskId', jsonData.id);",
+              "        console.log('TaskId guardado automáticamente:', jsonData.id);",
+              "    }",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"title\": \"Implementar prueba técnica\",\n  \"description\": \"Configurar NestJS, Prisma y PostgreSQL\",\n  \"status\": \"PENDING\",\n  \"assignee\": \"Juan Guerra\",\n  \"dueDate\": \"2026-12-01T12:00:00.000Z\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks"
+          ]
+        },
+        "description": "Crea una nueva tarea. El script de pruebas guarda automáticamente el UUID en la variable {{taskId}} para los siguientes requests."
+      },
+      "response": []
+    },
+    {
+      "name": "2. Listar Tareas",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks"
+          ]
+        },
+        "description": "Obtiene la lista completa de tareas ordenadas por fecha de creación descendente."
+      },
+      "response": []
+    },
+    {
+      "name": "3. Obtener Tarea por ID",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            "{{taskId}}"
+          ]
+        },
+        "description": "Obtiene la tarea correspondiente al {{taskId}} capturado al crear la tarea."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Actualizar Tarea (PATCH)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"IN_PROGRESS\",\n  \"assignee\": \"Tech Lead\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            "{{taskId}}"
+          ]
+        },
+        "description": "Actualiza parcialmente los campos de la tarea identificada por {{taskId}}."
+      },
+      "response": []
+    },
+    {
+      "name": "5. Eliminar Tarea",
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/{{taskId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            "{{taskId}}"
+          ]
+        },
+        "description": "Elimina la tarea identificada por {{taskId}}."
+      },
+      "response": []
+    },
+    {
+      "name": "6. Probar Error 404 (ID inexistente)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks/00000000-0000-0000-0000-000000000000",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks",
+            "00000000-0000-0000-0000-000000000000"
+          ]
+        },
+        "description": "Comprueba que la API retorne correctamente NotFoundException (HTTP 404) cuando el ID no existe en la base de datos."
+      },
+      "response": []
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    },
+    {
+      "key": "taskId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
