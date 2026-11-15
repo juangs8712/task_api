@@ -1,35 +1,21 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
 import { TaskStatus } from '@prisma/client';
-
-export interface CreateTaskInput {
-  title: string;
-  description?: string;
-  status?: TaskStatus;
-  assignee?: string;
-  dueDate: string | Date;
-}
-
-export interface UpdateTaskInput {
-  title?: string;
-  description?: string;
-  status?: TaskStatus;
-  assignee?: string;
-  dueDate?: string | Date;
-}
+import { CreateTaskDto } from './dto/create-task.dto.js';
+import { UpdateTaskDto } from './dto/update-task.dto.js';
 
 @Injectable()
 export class TasksService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async create(data: CreateTaskInput) {
+  async create(createTaskDto: CreateTaskDto) {
     return this.prisma.task.create({
       data: {
-        title: data.title,
-        description: data.description,
-        status: data.status ?? TaskStatus.PENDING,
-        assignee: data.assignee,
-        dueDate: new Date(data.dueDate),
+        title: createTaskDto.title,
+        description: createTaskDto.description,
+        status: createTaskDto.status ?? TaskStatus.PENDING,
+        assignee: createTaskDto.assignee,
+        dueDate: new Date(createTaskDto.dueDate),
       },
     });
   }
@@ -52,17 +38,17 @@ export class TasksService {
     return task;
   }
 
-  async update(id: string, data: UpdateTaskInput) {
+  async update(id: string, updateTaskDto: UpdateTaskDto) {
     await this.findOne(id);
 
     return this.prisma.task.update({
       where: { id },
       data: {
-        title: data.title,
-        description: data.description,
-        status: data.status,
-        assignee: data.assignee,
-        dueDate: data.dueDate ? new Date(data.dueDate) : undefined,
+        title: updateTaskDto.title,
+        description: updateTaskDto.description,
+        status: updateTaskDto.status,
+        assignee: updateTaskDto.assignee,
+        dueDate: updateTaskDto.dueDate ? new Date(updateTaskDto.dueDate) : undefined,
       },
     });
   }
