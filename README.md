@@ -19,6 +19,9 @@ pnpm prisma generate
 
 # 4. Iniciar la aplicación en modo desarrollo
 pnpm run start:dev
+
+# 5. Ejecutar tests unitarios
+pnpm test
 ```
 
 ## Endpoints del CRUD (`/tasks`)
@@ -65,3 +68,4 @@ pnpm run start:dev
 - **Módulo Prisma y CRUD básico:** Se implementó `PrismaService` global (`OnModuleInit`/`OnModuleDestroy`) y el módulo de tareas (`TasksService`, `TasksController`) con endpoints REST y manejo de excepciones `NotFoundException` (404).
 - **Validación robusta con DTOs:** Se integraron `class-validator`, `class-transformer` y `@nestjs/mapped-types`. Se configuró `ValidationPipe` global con `whitelist: true` y `forbidNonWhitelisted: true`, asegurando respuestas `400 Bad Request` ante entradas inválidas.
 - **Paginación y filtrado condicional:** Se creó `GetTasksFilterDto` con validación y transformación de query parameters (`page`, `limit`, `status`, `assignee`). Se implementó una consulta atómica con `prisma.$transaction` para calcular el total y los registros en un solo viaje a la base de datos, retornando la estructura estandarizada `{ data, meta }`.
+- **Tests unitarios críticos:** Se implementaron pruebas unitarias con Jest para `TasksService` ([tasks.service.spec.ts](src/tasks/tasks.service.spec.ts)) cubriendo creación exitosa, paginación con `$transaction` y lanzamiento de `NotFoundException` (404) ante IDs inexistentes, con tipado estricto de mocks.
