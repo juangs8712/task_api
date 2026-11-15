@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "c1f82b7d-419b-4f9e-a0e2-63b1ef8a11bc",
     "name": "Tasks API - NestJS",
-    "description": "Colección de endpoints para probar el CRUD de Tasks API (NestJS + Prisma + PostgreSQL).",
+    "description": "Colección de endpoints para probar el CRUD de Tasks API (NestJS + Prisma + PostgreSQL) con validación, paginación y filtros.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -51,25 +51,77 @@
       "response": []
     },
     {
-      "name": "2. Listar Tareas",
+      "name": "2. Listar Tareas (Paginado)",
       "request": {
         "method": "GET",
         "header": [],
         "url": {
-          "raw": "{{baseUrl}}/tasks",
+          "raw": "{{baseUrl}}/tasks?page=1&limit=10",
           "host": [
             "{{baseUrl}}"
           ],
           "path": [
             "tasks"
+          ],
+          "query": [
+            {
+              "key": "page",
+              "value": "1",
+              "description": "Número de página (por defecto: 1)"
+            },
+            {
+              "key": "limit",
+              "value": "10",
+              "description": "Cantidad de tareas por página (por defecto: 10)"
+            }
           ]
         },
-        "description": "Obtiene la lista completa de tareas ordenadas por fecha de creación descendente."
+        "description": "Obtiene la lista de tareas paginada con su estructura de metadatos { data, meta }."
       },
       "response": []
     },
     {
-      "name": "3. Obtener Tarea por ID",
+      "name": "3. Listar Tareas con Filtros",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks?status=PENDING&assignee=Juan Guerra&page=1&limit=5",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "PENDING",
+              "description": "Filtro por estado: PENDING, IN_PROGRESS o DONE"
+            },
+            {
+              "key": "assignee",
+              "value": "Juan Guerra",
+              "description": "Filtro por responsable asignado"
+            },
+            {
+              "key": "page",
+              "value": "1",
+              "description": "Página solicitada"
+            },
+            {
+              "key": "limit",
+              "value": "5",
+              "description": "Límite por página"
+            }
+          ]
+        },
+        "description": "Filtra tareas condicionalmente por estado y/o asignado junto a la paginación."
+      },
+      "response": []
+    },
+    {
+      "name": "4. Obtener Tarea por ID",
       "request": {
         "method": "GET",
         "header": [],
@@ -88,7 +140,7 @@
       "response": []
     },
     {
-      "name": "4. Actualizar Tarea (PATCH)",
+      "name": "5. Actualizar Tarea (PATCH)",
       "request": {
         "method": "PATCH",
         "header": [
@@ -116,7 +168,7 @@
       "response": []
     },
     {
-      "name": "5. Eliminar Tarea",
+      "name": "6. Eliminar Tarea",
       "request": {
         "method": "DELETE",
         "header": [],
@@ -135,7 +187,7 @@
       "response": []
     },
     {
-      "name": "6. Probar Error 404 (ID inexistente)",
+      "name": "7. Probar Error 404 (ID inexistente)",
       "request": {
         "method": "GET",
         "header": [],
@@ -150,6 +202,63 @@
           ]
         },
         "description": "Comprueba que la API retorne correctamente NotFoundException (HTTP 404) cuando el ID no existe en la base de datos."
+      },
+      "response": []
+    },
+    {
+      "name": "8. Probar Validación Body (HTTP 400)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"description\": \"Payload inválido sin título ni fecha requerida\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/tasks",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks"
+          ]
+        },
+        "description": "Comprueba que la API retorne correctamente BadRequestException (HTTP 400) al enviar un payload con campos faltantes o inválidos."
+      },
+      "response": []
+    },
+    {
+      "name": "9. Probar Validación Query Filter (HTTP 400)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/tasks?status=INVALID_STATUS&page=0",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "tasks"
+          ],
+          "query": [
+            {
+              "key": "status",
+              "value": "INVALID_STATUS",
+              "description": "Estado inválido fuera del enum"
+            },
+            {
+              "key": "page",
+              "value": "0",
+              "description": "Página inválida (menor a 1)"
+            }
+          ]
+        },
+        "description": "Comprueba que ValidationPipe valide también los query parameters retornando HTTP 400 ante parámetros erróneos."
       },
       "response": []
     }

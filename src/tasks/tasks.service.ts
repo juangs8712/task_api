@@ -1,8 +1,9 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service.js';
-import { TaskStatus } from '@prisma/client';
+import { Prisma, TaskStatus } from '@prisma/client';
 import { CreateTaskDto } from './dto/create-task.dto.js';
 import { UpdateTaskDto } from './dto/update-task.dto.js';
+import { GetTasksFilterDto } from './dto/get-tasks-filter.dto.js';
 
 @Injectable()
 export class TasksService {
@@ -20,10 +21,43 @@ export class TasksService {
     });
   }
 
-  async findAll() {
-    return this.prisma.task.findMany({
-      orderBy: { createdAt: 'desc' },
-    });
+  async findAll(filterDto?: GetTasksFilterDto) {
+    const page = filterDto?.page ? Number(filterDto.page) : 1;
+    const limit = filterDto?.limit ? Number(filterDto.limit) : 10;
+    const skip = (page - 1) * limit;
+    const take = limit;
+
+    const where: Prisma.TaskWhereInput = {};
+
+    if (filterDto?.status) {
+      where.status = filterDto.status;
+    }
+
+    if (filterDto?.assignee) {
+      where.assignee = filterDto.assignee;
+    }
+
+    const [total, tasks] = await this.prisma.$transaction([
+      this.prisma.task.count({ where }),
+      this.prisma.task.findMany({
+        where,
+        skip,
+        take,
+        orderBy: { createdAt: 'desc' },
+      }),
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: tasks,
+      meta: {
+        total,
+        page,
+        limit,
+        totalPages,
+      },
+    };
   }
 
   async findOne(id: string) {
