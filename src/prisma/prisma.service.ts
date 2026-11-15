@@ -15,7 +15,10 @@ function getDatabaseUrl(): string {
 }
 
 @Injectable()
-export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class PrismaService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   constructor() {
     const connectionString = getDatabaseUrl();
     const adapter = new PrismaPg({ connectionString });

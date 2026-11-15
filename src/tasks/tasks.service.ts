@@ -82,7 +82,9 @@ export class TasksService {
         description: updateTaskDto.description,
         status: updateTaskDto.status,
         assignee: updateTaskDto.assignee,
-        dueDate: updateTaskDto.dueDate ? new Date(updateTaskDto.dueDate) : undefined,
+        dueDate: updateTaskDto.dueDate
+          ? new Date(updateTaskDto.dueDate)
+          : undefined,
       },
     });
   }
