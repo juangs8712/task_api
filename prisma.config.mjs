@@ -13,6 +13,9 @@ function getDatabaseUrl() {
 
 export default {
   schema: 'prisma/schema.prisma',
+  migrations: {
+    seed: 'node prisma/seed.ts',
+  },
   datasource: {
     url: getDatabaseUrl(),
   },
